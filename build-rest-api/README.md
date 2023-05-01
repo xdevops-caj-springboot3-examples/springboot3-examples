@@ -9,6 +9,13 @@
 - Lombok
 - [MapStruct](https://mapstruct.org/) for DTO bean mapping
 
+## Features
+
+- Build REST APIS
+- Parameter validation
+- Bean mapping
+- Global exception handling
+
 ## Using MapStruct in Spring Boot project with Lombok
 
 Properties:
