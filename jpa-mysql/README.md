@@ -51,7 +51,7 @@ After connected to the `local-mysql`, create a new database schema.
 ```text
 Schema Name: schooldb
 Character Set: utf8mb4
-Collation: utf8mb4_general_c
+Collation: utf8mb4_unicode_ci
 ```
 
 Or execute SQL:
@@ -226,7 +226,7 @@ alter table t_student add constraint email_address_unique unique (email_address)
 
 Notes:
 - Create a `t_student` table
-- Re-create the `email_address_unique` unique index with `email_address` column.
+- Create the `email_address_unique` unique index with `email_address` column.
 
 In MySQL Workbench, find the new created `t_sutdent` table, right click and choose Table Inpsector to check the table details.
 
@@ -1597,6 +1597,7 @@ Build the application:
 ```bash
 mvn clean install
 ```
+
 
 
 
