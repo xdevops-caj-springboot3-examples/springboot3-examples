@@ -12,6 +12,7 @@
 ## Features
 
 - Build REST APIS
+- Database access
 - Parameter validation
 - Bean mapping
 - Global exception handling
