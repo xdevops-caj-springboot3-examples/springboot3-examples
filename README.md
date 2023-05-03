@@ -7,3 +7,4 @@
 3. [Build REST API](./build-rest-api/README.md)
 4. [Spring Data JPA for MySQL](./jpa-mysql/README.md)
 5. [Application Event](./application-event/README.md)
+6. [Generate PDF Asynchronously with @Async](./async-generate-pdf/README.md)

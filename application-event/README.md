@@ -93,6 +93,17 @@ Check logs:
 Sending registration email: email address = bruce@example.com
 ```
 
+## Appendix
+
+### If Application Event can be used cross microservices
+
+By default, Spring Boot ApplicationEvent is designed to be used within the same application context. However, Spring provides several mechanisms to enable events to be sent across different contexts or even across different processes.
+
+One approach is to use a Spring Integration or Spring Cloud Stream to handle the messaging layer for events. 
+
+Another approach is to use a messaging system such as RabbitMQ, Apache Kafka, or ActiveMQ to handle the messaging layer for events.
+
+
 ## Troubleshooting
 
 ## H2 database "Syntax error in SQL statement ... expected identifier"
