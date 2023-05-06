@@ -1,13 +1,11 @@
 package com.example.openapispec.issue.controller;
 
-import com.example.openapispec.issue.dto.response.CreateIssueResponseDTO;
 import com.example.openapispec.issue.dto.request.CreateIssueRequestDTO;
+import com.example.openapispec.issue.dto.response.CreateIssueResponseDTO;
 import com.example.openapispec.issue.dto.response.QueryIssueResponseDTO;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
