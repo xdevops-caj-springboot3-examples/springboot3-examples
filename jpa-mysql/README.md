@@ -1598,6 +1598,83 @@ Build the application:
 mvn clean install
 ```
 
+## The drawbacks of Spring Data JPA One-to-Many relationship
+
+While Spring Data JPA makes it easy to map one-to-many and many-to-one relationships between entities, there are some potential drawbacks to consider:
+
+- Performance: One potential issue with one-to-many and many-to-one relationships is the performance impact of fetching and managing large amounts of data. For example, if you have an entity with a one-to-many relationship to another entity that has a large number of child entities, fetching the parent entity could result in a large amount of data being loaded into memory. This could impact application performance and memory usage.
+- Complexity: Another potential issue is the complexity of managing bidirectional relationships. In a bidirectional relationship, each entity has a reference to the other entity, which can make it more difficult to manage updates and ensure data consistency. This complexity can be further compounded if you have nested bidirectional relationships.
+- Data consistency: When working with one-to-many and many-to-one relationships, it's important to ensure data consistency. For example, if you delete a parent entity that has child entities, you'll need to ensure that the child entities are either deleted or reassigned to a different parent entity to avoid orphaned data. This can be challenging to manage, especially if you have complex relationships between entities.
+- Database design: One-to-many and many-to-one relationships can also impact your database design. For example, if you have a one-to-many relationship, you'll need to decide whether to use a foreign key on the child table or a foreign key on the parent table to reference the child entities. This decision can impact the performance and maintainability of your application.
+
+### The N+1 Query Problem
+
+The N+1 query problem is a common performance issue in object-relational mapping (ORM) systems, such as Hibernate or Spring Data JPA. It occurs when the ORM system generates a large number of database queries, typically N+1 queries, to retrieve related data for a set of objects.
+
+The N+1 query problem occurs when an application needs to retrieve a collection of objects and the associated data for each object. For example, consider an e-commerce application that needs to retrieve a list of orders and the associated customer data for each order. If the application retrieves the list of orders and then, for each order, retrieves the associated customer data with a separate query, this can result in N+1 queries being executed (one query to retrieve the list of orders and N queries to retrieve the associated customer data for each order).
+
+The N+1 query problem can have a significant impact on performance, especially when dealing with large datasets or slow database connections. To mitigate this issue, ORM systems offer a few solutions:
+
+Eager loading: By default, ORM systems often use lazy loading, which means that related data is only loaded when it is accessed. To avoid the N+1 query problem, you can use eager loading, which loads all of the related data upfront in a single query.
+
+Join fetching: Another solution is to use join fetching, which allows the ORM system to fetch related data using a single SQL join query, rather than executing multiple queries.
+
+Batch fetching: Batch fetching is a technique where the ORM system fetches related data for multiple objects in a single query, rather than executing separate queries for each object.
+
+### Resolve LazyInitializationException
+
+#### Option 1 - Change to FetchType.EAGER
+
+Test method is `PublicationRepositoryTest.findByCategory()`.
+
+```java
+    @OneToMany(
+            mappedBy = "publication",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
+    private List<Article> articles = new ArrayList<>();
+```
+
+### Use left join fetch to resolve N+1 query problem
+
+Test method is `PublicationRepositoryTest.queryByCategory()`.
+
+```java
+    @Query("select p from Publication p left join fetch p.articles b where p.category = :category")
+    List<Publication> queryByCategory(@Param("category") String category);
+```
+
+The SQL logs:
+```sql 
+select p1_0.publication_id,a1_0.publication_id,a1_0.article_id,a1_0.title,p1_0.category,p1_0.name 
+from t_publication p1_0 left join t_article a1_0 on p1_0.publication_id=a1_0.publication_id 
+where p1_0.category=?
+```
+
+Notes:
+- It is a `left join` query instead of N+1 queries.
+
+### Use @EntityGraph to resolve N+1 query problem
+
+The test method is `AuthorRepositoryTest.testFindByNationality()`.
+
+```java
+    @EntityGraph(
+            type = EntityGraph.EntityGraphType.FETCH,
+            attributePaths = {"books"}
+    )
+    List<Author> findByNationality(String nationality);
+```
+
+Notes:
+- EntityGraphType.FETCH means that the specified entity graph should be used to eagerly fetch the specified attributes, i.e., the attributes should be loaded along with the entity when it is retrieved from the database. This helps to avoid the N+1 query problem, where each entity is retrieved with a separate query.
+
+
+References:
+- https://medium.com/geekculture/jpa-entitygraphs-a-solution-to-n-1-query-problem-e29c28abe5fb
+
+
 
 
 
