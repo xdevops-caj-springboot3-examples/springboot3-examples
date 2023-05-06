@@ -1670,9 +1670,72 @@ The test method is `AuthorRepositoryTest.testFindByNationality()`.
 Notes:
 - EntityGraphType.FETCH means that the specified entity graph should be used to eagerly fetch the specified attributes, i.e., the attributes should be loaded along with the entity when it is retrieved from the database. This helps to avoid the N+1 query problem, where each entity is retrieved with a separate query.
 
-
 References:
 - https://medium.com/geekculture/jpa-entitygraphs-a-solution-to-n-1-query-problem-e29c28abe5fb
+
+### Use database view to resolve N+1 query problem
+
+Create a view, see `resources/db/create_view.sql`:
+
+```sql 
+CREATE OR REPLACE VIEW v_order_summary AS
+SELECT oi.item_id, o.order_id, o.order_date, c.name as customer_name, p.product_name, oi.quantity
+FROM t_order o
+JOIN t_customer c ON o.customer_id = c.customer_id
+JOIN t_order_item oi ON o.order_id = oi.order_id
+JOIN t_product p ON oi.product_id = p.product_id;
+```
+
+Notes:
+- Ensure the view has an unique id column, e.g., `item_id` in this case.
+- If no column can be the unique id column, use `uuid()` to generate a unique id column.
+
+Create an `@Immutable` entity class for the view:
+```java
+@Entity
+@Immutable
+@Table(name = "v_order_summary")
+@Getter
+public class OrderSummary {
+
+    @Id
+    private Long itemId;
+    private Long orderId;
+    @Column(name = "order_date")
+    private LocalDate orderDate;
+    @Column(name = "customer_name")
+    private String customerName;
+    @Column(name = "product_name")
+    private String productName;
+    private Integer quantity;
+}
+```
+
+Notes:
+- Ensure the entity class has an unique id, e.g., `itemId` in this case.
+
+Create a repository interface for the view:
+
+```java
+@Repository
+public interface OrderSummaryRepository extends JpaRepository<OrderSummary, Long> {
+
+    List<OrderSummary> findByOrderId(Long orderId);
+}
+```
+
+Test method is `OrderSummaryRepositoryTest.testFindByOrderId()`.
+
+The SQL logs:
+```sql
+select o1_0.item_id,o1_0.customer_name,o1_0.order_date,o1_0.order_id,o1_0.product_name,o1_0.quantity 
+from v_order_summary o1_0 where o1_0.order_id=?
+```
+
+Notes:
+- It is a single table query from the view.
+
+
 
 
 
