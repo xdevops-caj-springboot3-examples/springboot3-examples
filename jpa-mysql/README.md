@@ -1736,6 +1736,109 @@ Notes:
 - It is a single table query from the view.
 
 
+## Enable JPA auditing and soft delete
+
+Create an abstract class:
+
+```java
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
+public abstract class Auditable {
+
+    @CreatedBy
+    protected String createdBy;
+
+    @CreatedDate
+    protected LocalDateTime createdDate;
+
+    @LastModifiedBy
+    protected String lastModifiedBy;
+
+    @LastModifiedDate
+    protected LocalDateTime lastModifiedDate;
+}
+```
+
+Notes:
+- `@MappedSuperclass` is used to annotate a class whose mapping information is applied to the entities that inherit from it. 
+  A mapped superclass has no separate table defined for it.
+- `@EntityListeners` is used to specify the callback listener classes to be used for an entity or mapped superclass.
+- `@CreatedBy` is used to annotate the field that stores the user who created the entity.
+- `@CreatedDate` is used to annotate the field that stores the date and time when the entity was created.
+- `@LastModifiedBy` is used to annotate the field that stores the user who last modified the entity.
+- `@LastModifiedDate` is used to annotate the field that stores the date and time when the entity was last modified.
+
+Enable JPA auditing via `@EnableJpaAuditing` annotation:
+
+```java
+@Configuration
+@EnableJpaAuditing
+public class JpaAuditConfig {
+}
+```
+
+Provide auditor (who is performing the action) via `AuditorAware` interface:
+
+```java
+@Component
+public class JpaAuditorAware implements AuditorAware<String> {
+    @Override
+    public Optional<String> getCurrentAuditor() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            return Optional.empty();
+//        }
+//
+//        return Optional.of(authentication.getName());
+        // TODO use Spring Security to get current user
+        return Optional.of("admin");
+    }
+}
+```
+
+Notes:
+- Should use Spring Security to get current user instead of hardcode it
+
+An example entity class:
+
+```java
+@Entity
+@Table(name = "t_post")
+@SQLDelete(sql = "UPDATE t_post SET deleted = true WHERE post_id = ?")
+@Where(clause = "deleted = false")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Post extends Auditable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long postId;
+    private String title;
+    private String content;
+    private boolean deleted;
+}
+```
+
+Notes:
+- Extends `Auditable` class to inject auditing fields.
+- Use `@SQLDelete` and `@Where` to implement soft delete.
+
+The test class is `PostRepositoryTest`.
+
+- Create a post
+- Update the post
+- Delete the post (soft delete)
+
+References:
+- https://www.linkedin.com/pulse/spring-data-jpa-auditing-abid-anjum?trk=pulse-article_more-articles_related-content-card
+- https://www.baeldung.com/spring-jpa-soft-delete
+
 
 
 
