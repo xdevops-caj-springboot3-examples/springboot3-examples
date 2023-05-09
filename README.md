@@ -9,3 +9,4 @@
 5. [Application Event](./application-event/README.md)
 6. [Generate PDF Asynchronously with @Async](./async-generate-pdf/README.md)
 7. [OpenAPI 3 Spec](./openapi-spec/README.md)
+8. [User register and authentication and secure your API with JWT token](./security-jwt/README.md)
