@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: jaeger-tracing
+
+# Jaeger collector url to accept OpenTelemetry Protocol (OTLP)
+tracing:
+  url: http://localhost:4318/v1/traces
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  pattern:
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+
