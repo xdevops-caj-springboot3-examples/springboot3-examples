@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# maven version plugin pom.xml backup
+pom.xml.versionsBackup
