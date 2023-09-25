@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -106,5 +108,24 @@ class StudentRepositoryTest {
     public void testUpdateStudentNameByEmailId() {
         int state = studentRepository.updateStudentNameByEmailId("Bruce", "Li", "bruce@example.com");
         assertEquals(1, state);
+    }
+
+    @Test
+    public void testFindStudentsByFirstNames() {
+//        studentRepository.save(Student.builder()
+//                .firstName("William")
+//                .lastName("Lin")
+//                .emailId("william@example.com")
+//                .build());
+//        studentRepository.save(Student.builder()
+//                .firstName("John")
+//                .lastName("Huang")
+//                .emailId("john@example.com")
+//                .build());
+
+        List<String> firstNames = List.of("William", "Tom", "John", "Jacky", "Frog");
+        String lastName = "Lin";
+        List<Student> students = studentRepository.findStudentsByNames(firstNames, lastName, PageRequest.of(0, 10));
+        System.out.println("students = " + students);
     }
 }

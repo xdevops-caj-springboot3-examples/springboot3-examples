@@ -2,6 +2,7 @@ package com.example.jpamysql.repository;
 
 import com.example.jpamysql.entity.Student;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -41,4 +42,12 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Transactional
     @Query("update Student set firstName = :firstName, lastName = :lastName where emailId = :email")
     int updateStudentNameByEmailId(@Param("firstName") String firstName, @Param("lastName") String lastName, @Param("email") String emailId);
+
+    @Query(
+            value = "select s.* from t_student s " +
+                    "where (coalesce(:firstNames) is  null or s.first_name in (:firstNames)) " +
+                    "and s.last_name  like concat ('%',:lastName, '%')",
+            nativeQuery = true
+    )
+    List<Student> findStudentsByNames(@Param("firstNames") List<String> firstNames, @Param("lastName") String lastName, Pageable pageable);
 }
